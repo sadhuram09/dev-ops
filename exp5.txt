@@ -1,0 +1,79 @@
+# ============================================
+# EXPERIMENT 2: Jenkins CI Pipeline with Maven
+# ============================================
+
+# PHASE 1: Update System & Install Java
+sudo apt update
+sudo apt install -y default-jre default-jdk
+java -version
+
+# PHASE 2: Install Jenkins
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+sudo apt update
+sudo apt install jenkins -y
+
+# PHASE 3: Start Jenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+sudo systemctl status jenkins
+
+# PHASE 4: Get Initial Admin Password
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+# Copy this password and paste it in browser
+
+# PHASE 5: Open Browser
+# Go to: http://<your-public-ip>:8080
+# Paste the password from above
+# Create user --> Save & Finish --> Start using Jenkins
+
+# AWS: Open port 8080
+# EC2 --> Instance --> Security --> Security Groups
+# Inbound Rules --> Edit --> Add Rule
+# Type: Custom TCP | Port: 8080 | Source: 0.0.0.0/0 --> Save
+
+# PHASE 6: Install Maven on Server
+wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz
+sudo tar -xvzf apache-maven-3.9.6-bin.tar.gz -C /opt/
+echo 'export M2_HOME=/opt/apache-maven-3.9.6' | sudo tee /etc/profile.d/maven.sh
+echo 'export PATH=$M2_HOME/bin:$PATH' | sudo tee -a /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+mvn -version
+
+# PHASE 7: Jenkins UI - Install Maven Plugin
+# Manage Jenkins --> Plugins --> Available
+# Search: Maven Integration --> Install
+
+# PHASE 8: Jenkins UI - Add Maven Tool
+# Manage Jenkins --> Tools --> Maven --> Add Maven
+# Name: maven 3.9.6
+# Uncheck "Install automatically"
+# Path: /opt/apache-maven-3.9.6
+# Save
+
+# PHASE 9: Jenkins UI - Create Freestyle Job
+# Dashboard --> New Item --> give name --> Freestyle Project --> OK
+# Description: add any description
+# Source Code Management --> Git
+# Repository URL: https://github.com/<your-username>/simple-java-maven-app.git
+# Branch: */master or */main
+# Build Steps --> Invoke top-level Maven targets
+# Maven Version: maven 3.9.6
+# Goals: clean install
+# Save --> Build Now
+
+# PHASE 10: Check Console Output
+# Click build #1 --> Console Output
+# Should see: BUILD SUCCESS
+
+# PHASE 11: Verify JAR File
+sudo su - jenkins
+cd /var/lib/jenkins/.m2/repository/com/mycompany/app/my-app/1.0-SNAPSHOT/
+java -jar my-app-1.0-SNAPSHOT.jar
+
+# Expected Output: Hello World!
