@@ -1,0 +1,71 @@
+# ============================================
+# EXPERIMENT 1: Maven to Gradle Migration
+# ============================================
+
+# PHASE 1: Update System & Install Java
+sudo apt update && sudo apt upgrade -y
+sudo apt install openjdk-17-jdk -y
+java -version
+
+# PHASE 2: Install Git & Clone Repo
+sudo apt install git -y
+git --version
+git clone https://github.com/<your-username>/simple-java-maven-app.git
+
+# PHASE 3: Install Maven
+wget https://archive.apache.org/dist/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz
+sudo tar -xvf apache-maven-3.9.2-bin.tar.gz -C /opt
+sudo ln -sfn /opt/apache-maven-3.9.2 /opt/maven
+echo 'export PATH=/opt/maven/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+mvn -version
+
+# PHASE 4: Build with Maven
+cd simple-java-maven-app
+mvn clean package
+ls target/
+java -jar target/*.jar
+
+# PHASE 5: Install Gradle
+cd ..
+sudo apt install unzip -y
+wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
+sudo mkdir /opt/gradle
+sudo unzip -d /opt/gradle gradle-8.5-bin.zip
+echo 'export PATH=$PATH:/opt/gradle/gradle-8.5/bin' >> ~/.bashrc
+source ~/.bashrc
+gradle -v
+
+# PHASE 6: Migrate to Gradle
+cd simple-java-maven-app
+gradle init
+# When prompted:
+# Found a Maven build. Generate a Gradle build from this? --> yes
+# Select build script DSL --> 2 (Groovy)
+# Generate build using new APIs? --> no
+
+# PHASE 7: Edit build.gradle
+nano build.gradle
+# CHANGE this line:
+#   java.sourceCompatibility = JavaVersion.VERSION_1_8
+# TO:
+#   java.sourceCompatibility = JavaVersion.VERSION_17
+#
+# ADD this block at the bottom:
+#   jar {
+#       manifest {
+#           attributes 'Main-Class': 'com.mycompany.app.App'
+#       }
+#   }
+#
+# Save: Ctrl+O --> Enter --> Ctrl+X
+
+# Verify changes
+cat build.gradle
+
+# PHASE 8: Build with Gradle
+gradle build
+gradle clean build
+java -jar build/libs/my-app-1.0-SNAPSHOT.jar
+
+# Expected output: Hello World!
