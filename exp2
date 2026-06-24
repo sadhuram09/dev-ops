@@ -1,0 +1,43 @@
+# PHASE 1: Install Java
+sudo apt update
+sudo apt install openjdk-17-jdk -y
+java -version
+
+# PHASE 2: Install Maven
+sudo apt install maven -y
+mvn -version
+
+# PHASE 3: Verify Both Installed
+java -version
+mvn -version
+
+# PHASE 4: Generate Maven Project
+mvn archetype:generate
+# When prompted:
+# Choose a number or apply filter: type 3609 --> press Enter
+# Choose version: 3 --> press Enter
+# Define value for analysisEngineClassName: analysis
+# Define value for groupId: group1
+# Define value for artifactId: artifact1
+# Define value for version: snapshot1
+# Define value for package: package1
+# Confirm properties (Y/N): y
+
+# PHASE 5: Explore Project Structure
+ls
+cd artifact1
+ls
+cat pom.xml
+
+# PHASE 6: Build the Project
+mvn clean install package
+# This will:
+# clean  - delete previous build files
+# install - install to local repo
+# package - create JAR file
+
+# PHASE 7: Check Build Output
+ls
+cd target
+ls
+# You should see the JAR file here
