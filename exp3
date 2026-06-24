@@ -1,0 +1,49 @@
+# ============================================
+# EXPERIMENT 4: Gradle Project Setup and Build
+# ============================================
+
+# PHASE 1: Install Java
+sudo apt update
+sudo apt install -y openjdk-17-jdk
+java -version
+
+# PHASE 2: Download and Install Gradle
+sudo apt install unzip -y
+wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
+sudo mkdir /opt/gradle
+sudo unzip -d /opt/gradle gradle-8.5-bin.zip
+
+# PHASE 3: Set Up Environment Variables
+echo "export PATH=/opt/gradle/gradle-8.5/bin:\$PATH" | sudo tee -a /etc/profile.d/gradle.sh
+source /etc/profile.d/gradle.sh
+gradle -v
+
+# PHASE 4: Create a Gradle Project
+mkdir my-gradle-project && cd my-gradle-project
+gradle init
+# When prompted:
+# Select type of project to generate --> 2 (application)
+# Select implementation language --> 3 (Java)
+# Generate multiple subprojects? --> no
+# Select build script DSL --> 2 (Groovy)
+# Select test framework --> 4 (JUnit Jupiter)
+# Project name --> gradle-demo
+# Source package --> com.myapp
+# Target version of Java --> press Enter (default 17)
+# Generate build using new APIs? --> no
+
+# PHASE 5: Build the Project
+gradle build
+
+# PHASE 6: Run the Project
+gradle run
+# Expected Output: Hello World!
+
+# PHASE 7: Run Tests
+gradle test
+
+# PHASE 8: See All Available Tasks
+gradle tasks
+
+# PHASE 9: See All Dependencies
+gradle dependencies
